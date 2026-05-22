@@ -111,53 +111,9 @@ export default function AuthSection({
     const cleanEmail = email.toLowerCase().trim();
     const isOfficialEmail = cleanEmail.endsWith("@univ-ouargla.dz");
 
-    // Fail-safe: Detect if user is registering/logging in using a personal email (like Gmail)
-    // or as a public visitor. We bypass Firebase completely to prevent any connection stalls.
     if (!isOfficialEmail) {
-      try {
-        const dummyUid = "local_uid_" + Math.random().toString(36).substring(2, 11);
-        const resolvedName = isRegister ? fullName : (cleanEmail.split("@")[0] || "الزميل الأستاذ");
-        
-        const fallbackProfUser = {
-          uid: dummyUid,
-          email: cleanEmail,
-          displayName: resolvedName,
-        };
-        const fallbackProfProfile: UserProfile = {
-          uid: dummyUid,
-          email: cleanEmail,
-          name: resolvedName,
-          department: department || "قسم الرياضيات",
-          createdAt: new Date().toISOString()
-        };
-
-        // Instantly save to local storage
-        localStorage.setItem("local_professor_user", JSON.stringify(fallbackProfUser));
-        localStorage.setItem("local_professor_profile", JSON.stringify(fallbackProfProfile));
-
-        // Fire parent update state handler
-        onProfileUpdated(fallbackProfProfile);
-        
-        // Dispatch custom global login event to instantly notify App.tsx
-        window.dispatchEvent(new CustomEvent("local_auth_changed", { 
-          detail: { user: fallbackProfUser, profile: fallbackProfProfile } 
-        }));
-
-        setSuccessMsg(isRegister 
-          ? "🎉 تم تفعيل وتثبيت حسابك بنجاح فوري كأستاذ (عبر نظام الحفظ المحلي لزوار ومجربي الكلية)!" 
-          : "🎉 تم تسجيل الدخول التجريبي بنجاح (عبر نظام الحفظ المحلي لزوار الكلية)!"
-        );
-        setError("");
-        
-        // Close modal quickly for instant satisfying visual feedback
-        setTimeout(() => {
-          setIsOpen(false);
-        }, 800);
-      } catch (localErr) {
-        setError("حدث خطأ أثناء إعداد الحساب التجريبي المحلي.");
-      } finally {
-        setLoading(false);
-      }
+      setError("🚫 للأسف، التسجيل والحجز متاح وبصورة حصرية فقط لأساتذة جامعة ورقلة المنتسبين. يجب استخدام البريد الإلكتروني الجامعي الرسمي الذي ينتهي بـ (@univ-ouargla.dz).");
+      setLoading(false);
       return;
     }
 
@@ -328,7 +284,7 @@ export default function AuthSection({
                 <h3 className="text-lg font-bold text-slate-800">
                   {isRegister ? "إنشاء حساب أستاذ جديد" : "تسجيل دخول الأساتذة"}
                 </h3>
-                <p className="text-xs text-slate-500 mt-1 font-sans">
+                <p className="text-xs text-slate-505 mt-1 font-sans">
                   كلية الرياضيات وعلوم المادة - جامعة قاصدي مرباح
                 </p>
               </div>
@@ -350,8 +306,7 @@ export default function AuthSection({
                   <span>تنبيه أمني وحماية البيانات:</span>
                 </p>
                 <p className="text-slate-600 leading-relaxed font-sans">
-                  يسمح القانون بحجز القاعات للأساتذة فقط بالبريد الجامعي الرسمي للكلية: <code className="text-slate-900 text-[11px] font-mono font-bold">@univ-ouargla.dz</code>.
-                  (للتجريب الخارجي يمكنك استخدام حساب gmail وسيكون الحساب تجريبياً).
+                  يقتصر حجز القاعات وتنظيم الجداول حصرياً على السادة الأساتذة المنتسبين لجامعة ورقلة، ويشترط استخدام البريد الإلكتروني الجامعي المعتمد: <code className="text-slate-900 text-[11px] font-mono font-bold">@univ-ouargla.dz</code> للولوج للنظام.
                 </p>
               </div>
 
@@ -423,7 +378,7 @@ export default function AuthSection({
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 block">كلمة المرور (من اختيارك):</label>
                 <div className="relative">
-                  <Lock className="absolute right-3 top-3.5 w-4 h-4 text-slate-400" />
+                  <Lock className="absolute right-3 top-3.5 w-4 h-4 text-slate-405" />
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
@@ -452,7 +407,7 @@ export default function AuthSection({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-100 disabled:text-slate-400 text-white font-bold text-sm rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 shadow-sm"
+                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-100 disabled:text-slate-405 text-white font-bold text-sm rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 shadow-sm"
               >
                 {loading ? (
                   <>
