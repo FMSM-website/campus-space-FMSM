@@ -318,12 +318,12 @@ export default function AuthSection({
 
       {/* Auth Modal Backdrop */}
       {isOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50" dir="rtl">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto" dir="rtl">
           <div 
-            className="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative"
+            className="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative flex flex-col max-h-[94vh] sm:max-h-[90vh] my-auto"
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-l from-emerald-50/50 via-slate-50 to-white p-5 border-b border-slate-200 flex items-center justify-between">
+            <div className="bg-gradient-to-l from-emerald-50/50 via-slate-50 to-white p-5 border-b border-slate-200 flex items-center justify-between shrink-0">
               <div>
                 <h3 className="text-lg font-bold text-slate-800">
                   {isRegister ? "إنشاء حساب أستاذ جديد" : "تسجيل دخول الأساتذة"}
@@ -341,7 +341,7 @@ export default function AuthSection({
             </div>
 
             {/* Modal Body */}
-            <form onSubmit={handleAuthSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleAuthSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
               
               {/* Warnings/Domain Guide */}
               <div className="bg-amber-50/65 border border-amber-200/85 p-3 rounded-xl text-xs space-y-1">
