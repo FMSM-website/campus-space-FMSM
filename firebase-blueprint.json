@@ -1,0 +1,198 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Professor profile data, restricted to university email holders.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique user ID matching Firebase Auth UID."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "University email address (e.g., name@univ-ouargla.dz)."
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name of the professor."
+        },
+        "department": {
+          "type": "string",
+          "description": "Department name within the faculty."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Registration timestamp."
+        }
+      },
+      "required": ["uid", "email", "name", "department", "createdAt"]
+    },
+    "Schedule": {
+      "title": "Official Schedule",
+      "description": "The base timetables for Semester 1 and Semester 2 containing pre-allocated classes and rooms.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique schedule slot ID."
+        },
+        "semester": {
+          "type": "number",
+          "description": "Syllabus semester (1 or 2)."
+        },
+        "day": {
+          "type": "string",
+          "enum": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],
+          "description": "Day of the week."
+        },
+        "period": {
+          "type": "number",
+          "description": "Period slot index (1 to 5)."
+        },
+        "periodTime": {
+          "type": "string",
+          "description": "Human-readable time range (e.g., '08:30 - 10:00')."
+        },
+        "room": {
+          "type": "string",
+          "description": "Room or lecture hall ID (e.g., 'قاعة 1', 'مدرج أ')."
+        },
+        "professor": {
+          "type": "string",
+          "description": "Name of the scheduled professor."
+        },
+        "specialty": {
+          "type": "string",
+          "description": "Academic specialty (e.g., رياضيات, فيزياء, كيمياء)."
+        },
+        "level": {
+          "type": "string",
+          "description": "Study Level (e.g., ليسانس, ماستر)."
+        },
+        "year": {
+          "type": "string",
+          "description": "University Year (e.g., سنة 1, سنة 2, سنة 3)."
+        },
+        "group": {
+          "type": "string",
+          "description": "Student Group (e.g., فوج 1, فوج 2)."
+        },
+        "module": {
+          "type": "string",
+          "description": "Academic module or course subject name (e.g., تحليل 1)."
+        }
+      },
+      "required": [
+        "id",
+        "semester",
+        "day",
+        "period",
+        "periodTime",
+        "room",
+        "professor",
+        "specialty",
+        "level",
+        "year",
+        "group",
+        "module"
+      ]
+    },
+    "Reservation": {
+      "title": "Classroom Booking",
+      "description": "Special classroom bookings reserved between 19h and 22h for the next day, safe from conflicts.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique key built using format '{room}_{date}_{period}'."
+        },
+        "roomId": {
+          "type": "string",
+          "description": "Room code being reserved."
+        },
+        "date": {
+          "type": "string",
+          "description": "Target date of booking in format YYYY-MM-DD."
+        },
+        "dayName": {
+          "type": "string",
+          "description": "Day of the week for booking."
+        },
+        "period": {
+          "type": "number",
+          "description": "Period slot index (1 to 5)."
+        },
+        "periodTime": {
+          "type": "string",
+          "description": "Time range format matched."
+        },
+        "profEmail": {
+          "type": "string",
+          "description": "Email of reserving professor."
+        },
+        "profName": {
+          "type": "string",
+          "description": "Name of the reserving professor."
+        },
+        "specialty": {
+          "type": "string",
+          "description": "Chosen academic specialty."
+        },
+        "level": {
+          "type": "string",
+          "description": "Target academic level."
+        },
+        "year": {
+          "type": "string",
+          "description": "Target level year."
+        },
+        "group": {
+          "type": "string",
+          "description": "Target student cohort group."
+        },
+        "module": {
+          "type": "string",
+          "description": "Target module course name."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when reservation was registered."
+        }
+      },
+      "required": [
+        "id",
+        "roomId",
+        "date",
+        "dayName",
+        "period",
+        "periodTime",
+        "profEmail",
+        "profName",
+        "specialty",
+        "level",
+        "year",
+        "group",
+        "module",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Store profiles of university math-matter professors."
+    },
+    "/schedules/{scheduleId}": {
+      "schema": { "$ref": "#/entities/Schedule" },
+      "description": "List of all standard schedule units for both S1 and S2 semesters."
+    },
+    "/reservations/{reservationId}": {
+      "schema": { "$ref": "#/entities/Reservation" },
+      "description": "Secure, non-overlapping on-demand evening reservations."
+    }
+  }
+}

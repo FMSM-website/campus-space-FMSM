@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net Default-Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\.\\@\\/]+$');
+    }
+
+    // --- Users ---
+    // Anyone can read profiles so names are searchable. Only the user can write their profile.
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isOwner(userId)
+        && request.resource.data.keys().hasAll(['uid', 'email', 'name', 'department', 'createdAt'])
+        && request.resource.data.keys().size() == 5
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 128
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.department is string;
+      allow delete: if false;
+    }
+
+    // --- Schedules ---
+    // Anyone can read schedule timetables. Writes allowed during initialization or in general by authenticated projs.
+    match /schedules/{scheduleId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // --- Reservations ---
+    // Anyone can read reservations (results visible to public).
+    // Only signed-in professors can create bookings under their own email, or delete their own.
+    match /reservations/{reservationId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && isValidId(reservationId)
+        && request.resource.data.keys().hasAll([
+          'id', 'roomId', 'date', 'dayName', 'period', 'periodTime',
+          'profEmail', 'profName', 'specialty', 'level', 'year', 'group', 'module', 'createdAt'
+        ])
+        && request.resource.data.keys().size() == 14
+        && request.resource.data.id == reservationId
+        && request.resource.data.profEmail == request.auth.token.email
+        && request.resource.data.roomId is string
+        && request.resource.data.roomId.size() <= 64
+        && request.resource.data.date is string
+        && request.resource.data.date.size() == 10
+        && request.resource.data.period is int
+        && request.resource.data.period >= 1
+        && request.resource.data.period <= 5;
+      
+      // Updates are not permitted on bookings (cancelling and re-booking is required to avoid status manipulation)
+      allow update: if false;
+
+      // Only the professor who did the booking can cancel/delete it
+      allow delete: if isSignedIn()
+        && resource.data.profEmail == request.auth.token.email;
+    }
+  }
+}
